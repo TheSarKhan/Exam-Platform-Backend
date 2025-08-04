@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: ExamApp
+
+  datasource:
+      url: jdbc:postgresql://localhost:5432/exam
+      username: postgres
+      password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  access-token-expire-time: 900000 #15 deq
+  refresh-token-expire-time: 86400000 #1 gun
+  secretKey: thisIsVeryVeryVerySecretKey

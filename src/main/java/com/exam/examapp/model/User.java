@@ -1,11 +1,9 @@
 package com.exam.examapp.model;
 
 import com.exam.examapp.model.enums.Role;
+import com.exam.examapp.security.model.CustomUserDetails;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
@@ -13,7 +11,9 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Builder
 @AllArgsConstructor
+@Table(name = "users")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
@@ -39,6 +39,14 @@ public class User {
 
     boolean isDeleted;
 
+    boolean isEnabled;
+
+    boolean isAccountNonExpired;
+
+    boolean isAccountNonLocked;
+
+    boolean isCredentialsNonExpired;
+
     LocalDateTime createdAt;
 
     LocalDateTime updatedAt;
@@ -46,12 +54,22 @@ public class User {
     @PrePersist
     void prePersist() {
         id = UUID.randomUUID();
-        isActive = true;
+        isActive =
+                isVerified =
+                        isAccountNonExpired =
+                                isAccountNonLocked =
+                                        isCredentialsNonExpired =
+                                                isEnabled =
+                                                        true;
         updatedAt = createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
     void preUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public CustomUserDetails getCustomUserDetails() {
+        return new CustomUserDetails(this);
     }
 }
