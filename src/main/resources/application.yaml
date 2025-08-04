@@ -17,4 +17,4 @@ spring:
 jwt:
   access-token-expire-time: 900000 #15 deq
   refresh-token-expire-time: 86400000 #1 gun
-  secretKey: thisIsVeryVeryVerySecretKey
+  secretKey: UqzLz4yRMAD1cShZ2mfh0a5B3LoF7hK5XrZp7YwX0FY=

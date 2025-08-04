@@ -3,6 +3,7 @@ package com.exam.examapp.security.service;
 import com.exam.examapp.model.User;
 import com.exam.examapp.model.enums.Role;
 import com.exam.examapp.repository.UserRepository;
+import com.exam.examapp.security.dto.LoginRequest;
 import com.exam.examapp.security.dto.RegisterRequest;
 import com.exam.examapp.security.dto.TokenResponse;
 import com.exam.examapp.service.interfaces.CacheService;
@@ -24,34 +25,54 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public String register(RegisterRequest request) {
-        log.info("Registering user: {}", request.username());
-        if (isUserExist(request)) {
-            log.error("User already exists with this information : {}", request);
-            return "User already exists with this information.";
-        }
-        User user = User.builder()
-                .email(request.email())
-                .role(Role.USER)
-                .password(passwordEncoder.encode(request.password()))
-                .username(request.username())
-                .build();
-        userRepository.save(user);
-        return "User registered successfully";
+    public String registerAsTeacher(RegisterRequest request) {
+        return register(request, Role.TEACHER);
     }
 
     @Override
-    public TokenResponse login(String username, String password) {
-        log.info("Logging in user: {}", username);
-        User user = userRepository.findByUsername(username);
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+    public String registerAsStudent(RegisterRequest request) {
+        return register(request, Role.STUDENT);
+    }
+
+    private String register(RegisterRequest request, Role role) {
+        log.info("Registering {} : {}", role.name(), request.username());
+        if (isUserExist(request)) {
+            log.error("{} already exists with this information : {}", role.name(), request);
+            return role.name() + " already exists with this information.";
+        }
+        User user = User.builder()
+                .email(request.email())
+                .role(role)
+                .password(passwordEncoder.encode(request.password()))
+                .username(request.username())
+                .phoneNumber(request.phoneNumber())
+                .build();
+        userRepository.save(user);
+        return role.name() + " registered successfully.";
+    }
+
+    private boolean isUserExist(RegisterRequest request) {
+        return userRepository.existsByUsername(request.username()) ||
+                userRepository.existsByEmail(request.email()) ||
+                userRepository.existsByPhoneNumber(request.phoneNumber());
+    }
+
+    @Override
+    public TokenResponse login(LoginRequest request) {
+        log.info("Logging in user: {}", request.username());
+        User user = userRepository.findByUsername(request.username());
+        if (user == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
             log.error("Invalid username or password.");
             throw new IllegalArgumentException("Invalid username or password.");
         }
-        String accessToken = jwtService.generateAccessToken(username);
-        String refreshToken = jwtService.generateRefreshToken(username);
+        if (!user.isActive() || user.isDeleted() ){
+            log.error("User is not active or deleted.");
+            throw new IllegalArgumentException("User is not active or deleted.");
+        }
+        String accessToken = jwtService.generateAccessToken(request.username());
+        String refreshToken = jwtService.generateRefreshToken(request.username());
 
-        cacheService.saveRefreshToken(username, refreshToken);
+        cacheService.saveRefreshToken(request.username(), refreshToken);
 
         log.info("User logged in successfully.");
         return new TokenResponse(accessToken, refreshToken);
@@ -84,11 +105,5 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Token refreshed successfully.");
         return new TokenResponse(accessToken, newRefreshToken);
-    }
-
-    private boolean isUserExist(RegisterRequest request) {
-        return userRepository.existsByUsername(request.username()) ||
-                userRepository.existsByEmail(request.email()) ||
-                userRepository.existsByPhoneNumber(request.phoneNumber());
     }
 }

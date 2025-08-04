@@ -35,8 +35,6 @@ public class User {
 
     boolean isActive;
 
-    boolean isVerified;
-
     boolean isDeleted;
 
     boolean isEnabled;
@@ -55,12 +53,11 @@ public class User {
     void prePersist() {
         id = UUID.randomUUID();
         isActive =
-                isVerified =
-                        isAccountNonExpired =
-                                isAccountNonLocked =
-                                        isCredentialsNonExpired =
-                                                isEnabled =
-                                                        true;
+                isAccountNonExpired =
+                        isAccountNonLocked =
+                                isCredentialsNonExpired =
+                                        isEnabled =
+                                                true;
         updatedAt = createdAt = LocalDateTime.now();
     }
 

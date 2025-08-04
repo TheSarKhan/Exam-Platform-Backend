@@ -1,12 +1,15 @@
 package com.exam.examapp.security.service;
 
+import com.exam.examapp.security.dto.LoginRequest;
 import com.exam.examapp.security.dto.RegisterRequest;
 import com.exam.examapp.security.dto.TokenResponse;
 
 public interface AuthService {
-    String register(RegisterRequest request);
+    String registerAsTeacher(RegisterRequest request);
 
-    TokenResponse login(String username, String password);
+    String registerAsStudent(RegisterRequest request);
+
+    TokenResponse login(LoginRequest request);
 
     String logout(String username);
 
