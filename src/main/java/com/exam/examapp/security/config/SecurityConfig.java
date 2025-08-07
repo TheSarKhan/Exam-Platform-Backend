@@ -49,7 +49,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
                 addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).
                 authorizeHttpRequests(authorize -> authorize.
-                        requestMatchers("/home", "/swagger-ui/**", "/v3/api-docs/**", "/api/v1/auth/**").
+                        requestMatchers("/home", "/swagger-ui/**",
+                                "/v3/api-docs/**", "/api/v1/auth/**",
+                                "/api/v1/test/**","/test/**").
                         permitAll().
                         anyRequest().
                         authenticated()).
