@@ -1,5 +1,6 @@
 package com.exam.examapp.service.impl;
 
+import com.exam.examapp.exception.custom.ResourceNotFoundException;
 import com.exam.examapp.model.User;
 import com.exam.examapp.repository.UserRepository;
 import com.exam.examapp.service.interfaces.UserService;
@@ -16,6 +17,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getByUsername(String username) {
         log.info("Getting user by username: {}", username);
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username).orElseThrow(() -> {
+            log.error("User not found.");
+            return new ResourceNotFoundException("User not found.");
+        });
     }
 }

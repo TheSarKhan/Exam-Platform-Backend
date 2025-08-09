@@ -1,26 +1,45 @@
-package com.exam.examapp.security.service;
+package com.exam.examapp.security.service.impl;
 
+import com.exam.examapp.exception.custom.ResourceNotFoundException;
 import com.exam.examapp.model.User;
 import com.exam.examapp.model.enums.Role;
 import com.exam.examapp.repository.UserRepository;
 import com.exam.examapp.security.dto.LoginRequest;
 import com.exam.examapp.security.dto.RegisterRequest;
 import com.exam.examapp.security.dto.TokenResponse;
+import com.exam.examapp.security.service.interfaces.AuthService;
+import com.exam.examapp.security.service.interfaces.EmailService;
 import com.exam.examapp.service.interfaces.CacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+import java.util.function.Supplier;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+    private final String REFRESH_TOKEN_HEADER = "refresh_token_";
+
+    private final String FORGET_PASSWORD_HEADER = "refresh_token_";
+
+    private final String ACCESS_RESET_PASSWORD = "access_reset_password_";
+
+    private final Supplier<ResourceNotFoundException> emailNotFoundExceptionSupplier = () -> {
+        log.error("Email not found.");
+        return new ResourceNotFoundException("Email not found.");
+    };
+
     private final UserRepository userRepository;
 
     private final CacheService cacheService;
 
     private final JwtService jwtService;
+
+    private final EmailService emailService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -60,8 +79,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse login(LoginRequest request) {
         log.info("Logging in user: {}", request.username());
-        User user = userRepository.findByUsername(request.username());
-        if (user == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
+        User user = userRepository.findByUsername(request.username()).orElseThrow(() ->
+        {
+            log.error("User not found.");
+            return new ResourceNotFoundException("User not found.");
+        });
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             log.error("Invalid username or password.");
             throw new IllegalArgumentException("Invalid username or password.");
         }
@@ -72,8 +95,6 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtService.generateAccessToken(request.username());
         String refreshToken = jwtService.generateRefreshToken(request.username());
 
-        cacheService.saveRefreshToken(request.username(), refreshToken);
-
         log.info("User logged in successfully.");
         return new TokenResponse(accessToken, refreshToken);
     }
@@ -82,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
     public String logout(String username) {
         log.info("Logging out user: {}", username);
 
-        cacheService.deleteRefreshToken(username);
+        cacheService.deleteContent(REFRESH_TOKEN_HEADER, username);
 
         log.info("Cache deleted.");
         return "User logged out successfully.";
@@ -96,14 +117,54 @@ public class AuthServiceImpl implements AuthService {
             log.error("Invalid refresh token.");
             throw new IllegalArgumentException("Invalid refresh token.");
         }
-        cacheService.deleteRefreshToken(username);
+        cacheService.deleteContent(REFRESH_TOKEN_HEADER, username);
 
         String accessToken = jwtService.generateAccessToken(username);
         String newRefreshToken = jwtService.generateRefreshToken(username);
 
-        cacheService.saveRefreshToken(username, newRefreshToken);
-
         log.info("Token refreshed successfully.");
         return new TokenResponse(accessToken, newRefreshToken);
+    }
+
+    @Override
+    public String forgetPassword(String email) {
+        log.info("Forgetting password for email: {}", email);
+        int randomCode = (int) (Math.random() * 900000) + 100000;
+        userRepository.findByEmail(email).orElseThrow(emailNotFoundExceptionSupplier);
+        String emailResponse =
+                emailService.sendEmail(email, "Akademix Verification Code", "Verification Code : " + randomCode);
+        cacheService.saveContent(FORGET_PASSWORD_HEADER, email, String.valueOf(randomCode), Long.valueOf(5 * 60 * 1000));
+        log.info(emailResponse);
+        return emailResponse;
+    }
+
+    @Override
+    public String verifyEmailCode(String email, String code) {
+        log.info("Verifying email code for email: {}", email);
+        String redisCode = cacheService.getContent(FORGET_PASSWORD_HEADER, email);
+        if (redisCode == null || !redisCode.equals(code)) {
+            log.error("Invalid code. code : "+"salam"+" redisCode : "+redisCode);
+            return "Invalid code.";
+        }
+        cacheService.deleteContent(FORGET_PASSWORD_HEADER, email);
+        log.info("Code verified successfully.");
+        UUID uuid = UUID.randomUUID();
+        cacheService.saveContent(ACCESS_RESET_PASSWORD, email, uuid.toString(), (long) 5 * 60 * 1000);
+        return uuid.toString();
+    }
+
+    @Override
+    public String resetPassword(String email, String password, String uuid) {
+        log.info("Resetting password for email: {}", email);
+        String redisUuid = cacheService.getContent(ACCESS_RESET_PASSWORD, email);
+        if (redisUuid == null || !redisUuid.equals(uuid)) {
+            return "Please don't copy paste the link.";
+        }
+        cacheService.deleteContent(ACCESS_RESET_PASSWORD, email);
+        User user = userRepository.findByEmail(email).orElseThrow(emailNotFoundExceptionSupplier);
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        log.info("Password reset successfully.");
+        return "Password reset successfully. Please login with new password.";
     }
 }

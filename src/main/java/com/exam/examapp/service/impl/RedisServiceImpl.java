@@ -17,15 +17,23 @@ public class RedisServiceImpl implements CacheService {
         this.redisTemplate = redisTemplate;
     }
 
-    public void saveRefreshToken(String username, String refreshToken) {
-        redisTemplate.opsForValue().set("refresh_token_" + username, refreshToken, 1, TimeUnit.DAYS);
+    @Override
+    public void saveContent(String header, String username, String refreshToken, Long expireIn) {
+        log.info("Saving content for username: {} in redis", username);
+        String key = header + username;
+        redisTemplate.opsForValue().set(key, refreshToken, expireIn, TimeUnit.MILLISECONDS);
     }
 
-    public String getRefreshToken(String username) {
-        return (String) redisTemplate.opsForValue().get("refresh_token_" + username);
+    @Override
+    public String getContent(String header, String username) {
+        log.info("Getting content for username: {} from redis", username);
+        String key = header + username;
+        return (String) redisTemplate.opsForValue().get(key);
     }
 
-    public void deleteRefreshToken(String username) {
-        redisTemplate.delete("refresh_token_" + username);
+    @Override
+    public void deleteContent(String header, String username) {
+        log.info("Deleting content for username: {} from redis", username);
+        redisTemplate.delete(header + username);
     }
 }

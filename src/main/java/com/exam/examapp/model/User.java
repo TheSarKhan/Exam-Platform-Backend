@@ -9,9 +9,12 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
+@ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 @Table(name = "users")
 @RequiredArgsConstructor
@@ -30,6 +33,8 @@ public class User {
     String phoneNumber;
 
     String password;
+
+    String profilePictureAddress;
 
     Role role;
 

@@ -1,4 +1,4 @@
-package com.exam.examapp.security.service;
+package com.exam.examapp.security.service.interfaces;
 
 import com.exam.examapp.security.dto.LoginRequest;
 import com.exam.examapp.security.dto.RegisterRequest;
@@ -14,4 +14,10 @@ public interface AuthService {
     String logout(String username);
 
     TokenResponse refresh(String refreshToken);
+
+    String forgetPassword(String email);
+
+    String verifyEmailCode(String email, String  code);
+
+    String resetPassword(String email, String password, String uuid);
 }

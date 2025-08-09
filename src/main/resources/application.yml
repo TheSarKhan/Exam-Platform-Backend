@@ -2,6 +2,9 @@ spring:
   application:
     name: ExamApp
 
+  config:
+    import: optional:classpath:email.yml
+
   datasource:
       url: jdbc:postgresql://localhost:5432/exam
       username: postgres

@@ -1,4 +1,4 @@
-package com.exam.examapp.security.service;
+package com.exam.examapp.security.service.impl;
 
 import com.exam.examapp.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;

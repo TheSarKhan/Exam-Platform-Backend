@@ -1,9 +1,11 @@
-package com.exam.examapp.security.service;
+package com.exam.examapp.security.service.impl;
 
+import com.exam.examapp.service.interfaces.CacheService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,10 @@ import java.util.Date;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class JwtService {
+    private final CacheService cacheService;
+
     @Value("${jwt.access-token-expire-time}")
     private Long accessTokenExpireTime;
 
@@ -30,7 +35,9 @@ public class JwtService {
 
     public String generateRefreshToken(String username){
         log.info("Generating refresh token for username: {}", username);
-        return generateToken(username, refreshTokenExpireTime);
+        String refreshToken = generateToken(username, refreshTokenExpireTime);
+        cacheService.saveContent("refresh_token_", username, refreshToken, refreshTokenExpireTime);
+        return refreshToken;
     }
 
     private String generateToken(String username, Long expireTime){

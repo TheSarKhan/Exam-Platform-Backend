@@ -3,9 +3,10 @@ package com.exam.examapp.security.controller;
 import com.exam.examapp.security.dto.LoginRequest;
 import com.exam.examapp.security.dto.RegisterRequest;
 import com.exam.examapp.security.dto.TokenResponse;
-import com.exam.examapp.security.service.AuthService;
+import com.exam.examapp.security.service.interfaces.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,5 +51,20 @@ public class AuthController {
             description = "Generates a new access token using the refresh token")
     public ResponseEntity<TokenResponse> refresh(@RequestParam String refreshToken) {
         return ResponseEntity.ok(authService.refresh(refreshToken));
+    }
+
+    @PostMapping("/forget-password")
+    public ResponseEntity<String> forgetPassword(@RequestParam @Email String email) {
+       return ResponseEntity.ok(authService.forgetPassword(email));
+    }
+
+    @PostMapping("/verify-email-code")
+    public ResponseEntity<String> verifyEmailCode(@RequestParam @Email String email, @RequestParam String code) {
+        return ResponseEntity.ok(authService.verifyEmailCode(email, code));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam @Email String email, @RequestParam String password, @RequestParam String uuid) {
+        return ResponseEntity.ok(authService.resetPassword(email, password, uuid));
     }
 }
