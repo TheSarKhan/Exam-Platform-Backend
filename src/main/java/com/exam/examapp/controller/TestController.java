@@ -1,6 +1,7 @@
 package com.exam.examapp.controller;
 
 import com.exam.examapp.service.interfaces.FileService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
