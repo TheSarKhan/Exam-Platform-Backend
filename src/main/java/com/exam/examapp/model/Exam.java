@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -23,8 +24,7 @@ import java.util.Map;
 @Table(name = "exams")
 public class Exam {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     private String examTitle;
 
@@ -34,6 +34,8 @@ public class Exam {
 
     @ManyToOne
     private Subject subject;
+
+    private int durationInMinutes;
 
     private int classNumber;
 
@@ -47,11 +49,13 @@ public class Exam {
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<Long, Double> userIdToRatingMap;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     private List<Question> questions;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User teacher;
+
+    private long averageCheckTimeInMinute;
 
     private boolean isDeleted;
 

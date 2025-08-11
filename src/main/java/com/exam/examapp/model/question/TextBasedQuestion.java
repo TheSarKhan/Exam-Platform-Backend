@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,7 +20,7 @@ import java.util.List;
 @Table(name = "text_based_questions")
 public class TextBasedQuestion {
     @Id
-    private Long id;
+    private UUID id;
 
     private int questionCount;
 

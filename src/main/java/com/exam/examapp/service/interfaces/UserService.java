@@ -4,4 +4,6 @@ import com.exam.examapp.model.User;
 
 public interface UserService {
     User getByUsername(String username);
+
+    User getCurrentUser();
 }

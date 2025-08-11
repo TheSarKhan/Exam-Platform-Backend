@@ -1,6 +1,7 @@
 package com.exam.examapp.model;
 
 
+import com.exam.examapp.model.enums.AnswerStatus;
 import com.exam.examapp.model.enums.ExamStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,6 +10,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -21,8 +23,7 @@ import java.util.Map;
 @Table(name = "students_exams")
 public class StudentExam {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,12 +33,17 @@ public class StudentExam {
     @ManyToOne(fetch = FetchType.LAZY)
     private Exam exam;
 
+    @Enumerated(EnumType.STRING)
     private ExamStatus status;
 
     private double score;
 
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<Character, String> questionNumberToAnswerMap;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Enumerated(EnumType.STRING)
+    private Map<Character, AnswerStatus> questionNumberToAnswerStatusMap;
 
     private Instant createdAt;
 

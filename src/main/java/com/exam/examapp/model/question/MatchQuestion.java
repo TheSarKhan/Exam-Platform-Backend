@@ -10,6 +10,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,7 +23,7 @@ import java.util.Map;
 @Table(name = "match_questions")
 public class MatchQuestion {
     @Id
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)

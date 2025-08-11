@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Entity
@@ -17,7 +19,7 @@ import lombok.*;
 @Table(name = "open_ended_questions")
 public class OpenEndedQuestion {
     @Id
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false)
     private boolean isAuto;

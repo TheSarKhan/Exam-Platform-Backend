@@ -34,7 +34,7 @@ public class User {
 
     String password;
 
-    String profilePictureAddress;
+    String profilePictureUrl;
 
     Role role;
 

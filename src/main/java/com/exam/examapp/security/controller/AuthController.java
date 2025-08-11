@@ -6,6 +6,7 @@ import com.exam.examapp.security.dto.TokenResponse;
 import com.exam.examapp.security.service.interfaces.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,21 +22,21 @@ public class AuthController {
     @PostMapping("/register-teacher")
     @Operation(summary = "Register a new teacher",
             description = "Creates a new teacher account and returns a success message")
-    public ResponseEntity<String> registerAsTeacher(@RequestBody RegisterRequest request) {
+    public ResponseEntity<String> registerAsTeacher(@RequestBody @Valid RegisterRequest request) {
         return ResponseEntity.ok(authService.registerAsTeacher(request));
     }
 
     @PostMapping("/register-student")
     @Operation(summary = "Register a new student",
             description = "Creates a new student account and returns a success message")
-    public ResponseEntity<String> registerAsStudent(@RequestBody RegisterRequest request) {
+    public ResponseEntity<String> registerAsStudent(@RequestBody @Valid RegisterRequest request) {
         return ResponseEntity.ok(authService.registerAsStudent(request));
     }
 
     @PostMapping("/login")
     @Operation(summary = "Login a user",
             description = "Authenticates the user and returns an access and refresh token")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<TokenResponse> login(@RequestBody @Valid LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 

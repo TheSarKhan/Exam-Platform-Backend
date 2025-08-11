@@ -6,6 +6,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,7 +19,7 @@ import java.util.Map;
 @Table(name = "single_choice_questions")
 public class SingleChoiceQuestion {
     @Id
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)

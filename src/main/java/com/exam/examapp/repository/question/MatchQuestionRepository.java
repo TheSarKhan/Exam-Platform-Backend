@@ -4,6 +4,8 @@ import com.exam.examapp.model.question.MatchQuestion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
-public interface MatchQuestionRepository extends JpaRepository<MatchQuestion, Long> {
+public interface MatchQuestionRepository extends JpaRepository<MatchQuestion, UUID> {
 }

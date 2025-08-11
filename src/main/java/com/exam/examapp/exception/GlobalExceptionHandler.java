@@ -3,6 +3,7 @@ package com.exam.examapp.exception;
 import com.exam.examapp.exception.custom.DirectoryException;
 import com.exam.examapp.exception.custom.FileException;
 import com.exam.examapp.exception.custom.ResourceNotFoundException;
+import com.exam.examapp.exception.custom.UserNotLoginException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,13 @@ public class GlobalExceptionHandler {
         log.error("Illegal argument: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse(ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotLoginException.class)
+    public ResponseEntity<ErrorResponse> handleNotLoginUser(UserNotLoginException ex, WebRequest request) {
+        log.error("User not login: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)

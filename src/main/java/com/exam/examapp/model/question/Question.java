@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,8 +20,7 @@ import java.time.Instant;
 @Table(name = "questions")
 public class Question {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false)
     private String title;
@@ -35,6 +35,8 @@ public class Question {
 
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
+
+    private int point;
 
     private Instant createdAt;
 
